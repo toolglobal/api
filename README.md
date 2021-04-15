@@ -1,5 +1,12 @@
 # API
 
+## Install
+```shell
+git clone https://github.com/wolot/api.git
+cd api && make
+cd bin && ./api
+```
+
 ## change log
 - v3_payments增加evname字段
 
