@@ -1,0 +1,2700 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "{{.Description}}",
+        "title": "{{.Title}}",
+        "contact": {},
+        "license": {},
+        "version": "{{.Version}}"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
+        "/v2/accounts/{address}": {
+            "get": {
+                "description": "根据地址查询账户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-general"
+                ],
+                "summary": "查询账户信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "账户地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.V2AccountResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/accounts/{address}": {
+            "get": {
+                "description": "查询合约账户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "查询合约账户信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "合约地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.V2ContractActResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/call": {
+            "post": {
+                "description": "仅在本节节点evm副本上执行合约，不会广播交易，不对区块产生影响，不消耗gas。用户估算智能合约消耗的gas，以及用于调用合约只读方法。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "只读调用合约（非离线签名，慎用）",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.ContractCallTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.EvmCallResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/deploy": {
+            "post": {
+                "description": "部署合约（私钥交易，非离线签名，慎用）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "部署合约（非离线签名，慎用）",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.ContractDeployTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/events/{txhash}": {
+            "get": {
+                "description": "查询事件日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "查询事件日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "交易hash",
+                        "name": "txhash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.V2EvmLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/invoke": {
+            "post": {
+                "description": "调用合约（私钥交易，非离线签名，慎用）,使用本接口调用合约只读方法会消耗gas。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "调用合约（非离线签名，慎用）",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.ContractInvokeTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/multisigTransactions": {
+            "post": {
+                "description": "发起evm多签交易，支持OLO转账、合约交易",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "发起evm多签交易",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.SignedMultisigEvmTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/query": {
+            "post": {
+                "description": "仅在本节节点evm副本上执行合约，不会广播交易，不对区块产生影响，不消耗gas。用户估算智能合约消耗的gas，以及用于调用合约只读方法。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "只读调用合约",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.SignedEvmTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.EvmCallResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/sign": {
+            "post": {
+                "description": "根据transaction参数进行签名",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "根据transaction参数进行签名",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.SignEvmTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/contract/transactions": {
+            "post": {
+                "description": "发起evm交易，支持普通转账、合约交易，普通转账默认使用本接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-contract"
+                ],
+                "summary": "发起evm交易",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.SignedEvmTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/convert/{publickey}": {
+            "get": {
+                "description": "地址转换，公钥转地址",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-general"
+                ],
+                "summary": "地址转换",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "v1账户地址，即用户公钥",
+                        "name": "publickey",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.V2ConvertResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/genkey": {
+            "get": {
+                "description": "随机生成mondo账户，该账户默认未上链，需要通过转账交易激活",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-general"
+                ],
+                "summary": "随机生成mondo账户",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.V2GenKeyResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/transactions": {
+            "post": {
+                "description": "发起批量交易",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v2-general"
+                ],
+                "summary": "发起批量交易",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.SignedBatchTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.PublicResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/accounts/{address}/payments": {
+            "get": {
+                "description": "根据用户地址查询Payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据用户地址查询Payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "账户地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种",
+                        "name": "symbol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种合约地址",
+                        "name": "contract",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Payment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/accounts/{address}/transactions": {
+            "get": {
+                "description": "根据账户地址查询交易记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据账户地址查询交易记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "账户地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间戳",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间戳",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Transaction"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/config/nodes": {
+            "get": {
+                "description": "查询节点配置信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-config"
+                ],
+                "summary": "查询节点配置信息",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/config.Nodes"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/config/tokens": {
+            "get": {
+                "description": "查询已发行代币",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-config"
+                ],
+                "summary": "查询已发行代币",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/config.Tokens"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/delegate": {
+            "post": {
+                "description": "用户委托交易",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "用户委托交易",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.DelegateTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功"
+                    }
+                }
+            }
+        },
+        "/v3/dpos/pool": {
+            "get": {
+                "description": "查询矿池信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询矿池信息",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/types.BeanDPOSPool"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/dpos/poollogs": {
+            "get": {
+                "description": "查询矿池记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询矿池记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "高度",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DPOSPoolLog"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/dpos/ranklogs": {
+            "get": {
+                "description": "查询DPOS排名",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询DPOS排名",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "高度",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DPOSRankLog"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/dpos/tcnlogs": {
+            "get": {
+                "description": "查询节点dpos记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询节点dpos记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "高度",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DPOSTcnLog"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/dpos/tinlogs": {
+            "get": {
+                "description": "查询用户dpos记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询用户dpos记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "高度",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DPOSTinLog"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/ext/price/{symbol}": {
+            "get": {
+                "description": "查询币种价格：币种-USDT交易对",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-extension"
+                ],
+                "summary": "查询币种价格",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "币种",
+                        "name": "symbol",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/bean.Ticker"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/ledgers": {
+            "get": {
+                "description": "查询所有账本",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "查询所有账本",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "开始时间戳",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间戳",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Ledger"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/ledgers/{height}": {
+            "get": {
+                "description": "根据高度查询账本",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据高度查询账本",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区块高度",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Ledger"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/ledgers/{height}/payments": {
+            "get": {
+                "description": "根据区块高度查询Payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据区块高度查询Payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区块高度",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种",
+                        "name": "symbol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种合约地址",
+                        "name": "contract",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Payment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/ledgers/{height}/transactions": {
+            "get": {
+                "description": "根据区块高度查询交易记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据区块高度查询交易记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "区块高度",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间戳",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间戳",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Transaction"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/nodes": {
+            "get": {
+                "description": "查询所有节点信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询所有节点信息",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.BeanValidator"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/nodes/{address}": {
+            "get": {
+                "description": "查询节点信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询节点信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/types.BeanValidator"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/nodes/{address}/voters": {
+            "get": {
+                "description": "查询节点投票人信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询节点投票人信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.BeanVots"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/payments": {
+            "get": {
+                "description": "查询所有Payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "查询所有Payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "币种",
+                        "name": "symbol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种合约地址",
+                        "name": "contract",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Payment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/transactions": {
+            "get": {
+                "description": "根据所有交易记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据所有交易记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "开始时间戳",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间戳",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Transaction"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/transactions/{txhash}": {
+            "get": {
+                "description": "根据txhash查询交易记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据txhash查询交易记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "交易hash",
+                        "name": "txhash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Transaction"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/transactions/{txhash}/payments": {
+            "get": {
+                "description": "根据txhash查询Payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-query"
+                ],
+                "summary": "根据txhash查询Payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "交易hash",
+                        "name": "txhash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种",
+                        "name": "symbol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "币种合约地址",
+                        "name": "contract",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "开始时间",
+                        "name": "begin",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "结束时间",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "游标",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "限制",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序(ASC/DESC)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.V3Payment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/voters/{address}": {
+            "get": {
+                "description": "查询投票者信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v3-dpos"
+                ],
+                "summary": "查询投票者信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/types.BeanVoter"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "bean.ContractCallTx": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "description": "合约地址",
+                    "type": "string"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "负载数据，abi.pack(function+参数) hex编码字符串",
+                    "type": "string"
+                },
+                "privkey": {
+                    "description": "交易发起者私钥",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "金额，通常为0",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.ContractDeployTx": {
+            "type": "object",
+            "properties": {
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格",
+                    "type": "string"
+                },
+                "memo": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "合约部署字节码",
+                    "type": "string"
+                },
+                "privkey": {
+                    "description": "交易发起者私钥",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额，通常为0",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.ContractInvokeTx": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "description": "合约地址",
+                    "type": "string"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格",
+                    "type": "string"
+                },
+                "memo": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "合约负载 abi.pack(function+参数)",
+                    "type": "string"
+                },
+                "privkey": {
+                    "description": "交易发起者私钥",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.DelegateTx": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "时间戳",
+                    "type": "integer"
+                },
+                "nonce": {
+                    "description": "交易发起者nonce",
+                    "type": "integer"
+                },
+                "opType": {
+                    "description": "操作类型：1-抵押选举 2-赎回 3-领取收益",
+                    "type": "integer"
+                },
+                "opValue": {
+                    "description": "Op对应的值，OpType=1时为抵押金额 OpType=2时不填或填0 OpType=3时填写领取金额",
+                    "type": "string"
+                },
+                "receiver": {
+                    "description": "OpType=1时为选举节点的地址",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "交易签名",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.EvmCallResult": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer"
+                },
+                "gasUsed": {
+                    "description": "消耗的gas",
+                    "type": "integer"
+                },
+                "msg": {
+                    "description": "msg",
+                    "type": "string"
+                },
+                "ret": {
+                    "description": "返回数据的hex编码",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.MultiSignature": {
+            "type": "object",
+            "properties": {
+                "pubKey": {
+                    "description": "多签公钥",
+                    "type": "object",
+                    "$ref": "#/definitions/bean.PubKeyMultisigThreshold"
+                },
+                "signatures": {
+                    "description": "用户签名列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "bean.Operation": {
+            "type": "object",
+            "properties": {
+                "to": {
+                    "description": "交易接受方地址，可以是普通用户地址、合约地址、节点账户地址",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.PubKeyMultisigThreshold": {
+            "type": "object",
+            "properties": {
+                "pubkeys": {
+                    "description": "多签用户公钥列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "threshold": {
+                    "description": "多签阈值",
+                    "type": "integer"
+                }
+            }
+        },
+        "bean.PublicResp": {
+            "type": "object",
+            "properties": {
+                "isSuccess": {
+                    "description": "是否成功",
+                    "type": "boolean"
+                },
+                "message": {
+                    "description": "消息提醒",
+                    "type": "string"
+                },
+                "result": {
+                    "description": "数据对象",
+                    "type": "object"
+                }
+            }
+        },
+        "bean.SignEvmTx": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "object",
+                    "properties": {
+                        "load": {
+                            "description": "合约负载，普通原声币转账时为空",
+                            "type": "string"
+                        },
+                        "memo": {
+                            "description": "备注",
+                            "type": "string"
+                        },
+                        "to": {
+                            "description": "交易接受者地址或合约地址",
+                            "type": "string"
+                        },
+                        "value": {
+                            "description": "交易金额",
+                            "type": "string"
+                        }
+                    }
+                },
+                "createdAt": {
+                    "description": "时间戳，可选",
+                    "type": "integer"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格，最低为1",
+                    "type": "string"
+                },
+                "nonce": {
+                    "description": "交易发起者nonce",
+                    "type": "integer"
+                },
+                "privateKey": {
+                    "description": "私钥",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.SignedBatchTx": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "时间戳，可选字段，秒/毫秒均可",
+                    "type": "integer"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格，至少为1",
+                    "type": "string"
+                },
+                "memo": {
+                    "description": "备注，必须\u003c256字节",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "模式:0-default/commit 1-async 2-sync",
+                    "type": "integer"
+                },
+                "nonce": {
+                    "description": "用户nonce，每次交易前从链上获取，每次交易nonce+1",
+                    "type": "integer"
+                },
+                "operations": {
+                    "description": "交易列表，数量不可大于10000笔",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bean.Operation"
+                    }
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "交易签名的hex字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.SignedEvmTx": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "object",
+                    "properties": {
+                        "load": {
+                            "description": "合约负载，普通原声币转账时为空",
+                            "type": "string"
+                        },
+                        "memo": {
+                            "description": "备注",
+                            "type": "string"
+                        },
+                        "to": {
+                            "description": "交易接受者地址或合约地址",
+                            "type": "string"
+                        },
+                        "value": {
+                            "description": "交易金额",
+                            "type": "string"
+                        }
+                    }
+                },
+                "createdAt": {
+                    "description": "时间戳，可选",
+                    "type": "integer"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格，最低为1",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "交易模式，默认为0；0-同步模式 1-全异步 2-半异步；如果tx执行时间较长、网络不稳定、出块慢，建议使用半异步模式。",
+                    "type": "integer"
+                },
+                "nonce": {
+                    "description": "交易发起者nonce",
+                    "type": "integer"
+                },
+                "sender": {
+                    "description": "交易发起者公钥",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "交易签名",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.SignedMultisigEvmTx": {
+            "type": "object",
+            "properties": {
+                "deadline": {
+                    "description": "有效截止时间",
+                    "type": "integer"
+                },
+                "from": {
+                    "description": "多签账户地址",
+                    "type": "string"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格，最低为1",
+                    "type": "string"
+                },
+                "load": {
+                    "description": "合约负载，普通原声币转账时为空",
+                    "type": "string"
+                },
+                "memo": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "交易模式，默认为0；0-同步模式 1-全异步 2-半异步；如果tx执行时间较长、网络不稳定、出块慢，建议使用半异步模式。",
+                    "type": "integer"
+                },
+                "nonce": {
+                    "description": "多签账户nonce",
+                    "type": "integer"
+                },
+                "signature": {
+                    "description": "交易签名",
+                    "type": "object",
+                    "$ref": "#/definitions/bean.MultiSignature"
+                },
+                "to": {
+                    "description": "交易接受者地址或合约地址",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.Ticker": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "交易金额",
+                    "type": "string"
+                },
+                "buy": {
+                    "description": "买入价",
+                    "type": "number"
+                },
+                "high": {
+                    "description": "最高价",
+                    "type": "string"
+                },
+                "last": {
+                    "description": "最新成交价",
+                    "type": "number"
+                },
+                "low": {
+                    "description": "最低价",
+                    "type": "string"
+                },
+                "rose": {
+                    "description": "振幅",
+                    "type": "string"
+                },
+                "sell": {
+                    "description": "卖出价",
+                    "type": "number"
+                },
+                "time": {
+                    "description": "时间戳 ms",
+                    "type": "integer"
+                },
+                "vol": {
+                    "description": "成交量",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.V2AccountResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "地址",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "余额",
+                    "type": "string"
+                },
+                "nonce": {
+                    "description": "nonce",
+                    "type": "integer"
+                }
+            }
+        },
+        "bean.V2ContractActResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "地址",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "余额",
+                    "type": "string"
+                },
+                "code": {
+                    "description": "合约字节码",
+                    "type": "string"
+                },
+                "nonce": {
+                    "description": "nonce",
+                    "type": "integer"
+                },
+                "suicided": {
+                    "description": "合约是否已自杀",
+                    "type": "boolean"
+                }
+            }
+        },
+        "bean.V2ConvertResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "地址",
+                    "type": "string"
+                },
+                "old_address": {
+                    "description": "旧地址，原公钥",
+                    "type": "string"
+                },
+                "public_key": {
+                    "description": "公钥，同上",
+                    "type": "string"
+                }
+            }
+        },
+        "bean.V2EvmLog": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "合约地址",
+                    "type": "string"
+                },
+                "blockHash": {
+                    "description": "区块hash",
+                    "type": "string"
+                },
+                "blockNumber": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "logIndex": {
+                    "description": "日志索引",
+                    "type": "integer"
+                },
+                "removed": {
+                    "description": "是否已移除",
+                    "type": "boolean"
+                },
+                "topics": {
+                    "description": "事件主题",
+                    "type": "string"
+                },
+                "transactionHash": {
+                    "description": "交易hash",
+                    "type": "string"
+                },
+                "transactionIndex": {
+                    "description": "交易索引",
+                    "type": "integer"
+                }
+            }
+        },
+        "bean.V2GenKeyResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "地址",
+                    "type": "string"
+                },
+                "privkey": {
+                    "description": "私钥",
+                    "type": "string"
+                },
+                "pubkey": {
+                    "description": "公钥（压缩公钥）",
+                    "type": "string"
+                }
+            }
+        },
+        "config.ERC20": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "TotalSupply string json:\"totalSupply\" // 总发行量，整数\nCreatedAt   string json:\"createdAt\"   // 发行时间",
+                    "type": "string"
+                },
+                "decimals": {
+                    "description": "小数位数",
+                    "type": "integer"
+                },
+                "icon": {
+                    "description": "Exchange    bool   json:\"exchange\"    // 是否在交易所交易\nWhitePaper  string json:\"whitePaper\"  // 白皮书\nWebsite     string json:\"website\"     // 官网",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "代币名称，例如Tool Global Blockchain",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "代币symbol，例如OLO",
+                    "type": "string"
+                }
+            }
+        },
+        "config.Node": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "节点地址",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "节点名称",
+                    "type": "string"
+                }
+            }
+        },
+        "config.Nodes": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.Node"
+                    }
+                }
+            }
+        },
+        "config.Tokens": {
+            "type": "object",
+            "properties": {
+                "coins": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.ERC20"
+                    }
+                }
+            }
+        },
+        "database.V3Ledger": {
+            "type": "object",
+            "properties": {
+                "blockHash": {
+                    "description": "区块hash",
+                    "type": "string"
+                },
+                "blockSize": {
+                    "description": "区块大小：字节",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "gasLimit": {
+                    "description": "区块gas限额之和",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "区块交易平均gas价格，可能是小数",
+                    "type": "string"
+                },
+                "gasUsed": {
+                    "description": "区块所有交易消耗gas之和",
+                    "type": "integer"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "txCount": {
+                    "description": "区块交易数",
+                    "type": "integer"
+                },
+                "validator": {
+                    "description": "区块验证者节点地址",
+                    "type": "string"
+                }
+            }
+        },
+        "database.V3Payment": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "description": "合约地址，原生币为空或全零黑洞地址",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "evName": {
+                    "description": "事件名称",
+                    "type": "string"
+                },
+                "hash": {
+                    "description": "交易hash",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "idx": {
+                    "description": "交易索引",
+                    "type": "integer"
+                },
+                "receiver": {
+                    "description": "转账接受方地址",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "转账发起方地址",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "币种，原生币为“OLO”",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额",
+                    "type": "string"
+                }
+            }
+        },
+        "database.V3Transaction": {
+            "type": "object",
+            "properties": {
+                "codei": {
+                    "description": "失败代码",
+                    "type": "integer"
+                },
+                "codes": {
+                    "description": "失败原因",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "events": {
+                    "description": "交易事件",
+                    "type": "string"
+                },
+                "gasLimit": {
+                    "description": "gas限额",
+                    "type": "integer"
+                },
+                "gasPrice": {
+                    "description": "gas价格",
+                    "type": "string"
+                },
+                "gasUsed": {
+                    "description": "gas使用量",
+                    "type": "integer"
+                },
+                "hash": {
+                    "description": "交易hash",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "memo": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "nonce": {
+                    "description": "交易发起者nonce",
+                    "type": "integer"
+                },
+                "payload": {
+                    "description": "负载",
+                    "type": "string"
+                },
+                "receiver": {
+                    "description": "交易接受者地址",
+                    "type": "string"
+                },
+                "sender": {
+                    "description": "交易发起者地址",
+                    "type": "string"
+                },
+                "typei": {
+                    "description": "交易类型",
+                    "type": "integer"
+                },
+                "types": {
+                    "description": "交易类型",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "交易金额",
+                    "type": "string"
+                }
+            }
+        },
+        "types.BeanDPOSPool": {
+            "type": "object",
+            "properties": {
+                "currentHeight": {
+                    "description": "当前高度",
+                    "type": "integer"
+                },
+                "lastHeight": {
+                    "description": "上一轮DPOS高度",
+                    "type": "integer"
+                },
+                "nextHeight": {
+                    "description": "下一轮DPOS高度",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.BeanValidator": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "节点公钥",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "余额（累积收益）",
+                    "type": "string"
+                },
+                "genesis": {
+                    "description": "是否是创世节点",
+                    "type": "boolean"
+                },
+                "mortgaged": {
+                    "description": "已抵押",
+                    "type": "string"
+                },
+                "nonce": {
+                    "description": "nonce",
+                    "type": "integer"
+                },
+                "power": {
+                    "description": "投票权",
+                    "type": "integer"
+                },
+                "redeem": {
+                    "description": "待赎回",
+                    "type": "boolean"
+                },
+                "runFor": {
+                    "description": "参与竞选",
+                    "type": "boolean"
+                },
+                "toMortgage": {
+                    "description": "待抵押",
+                    "type": "string"
+                },
+                "voted": {
+                    "description": "选民贡献",
+                    "type": "string"
+                },
+                "voters": {
+                    "description": "投票人数",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.BeanVot": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "选民地址",
+                    "type": "string"
+                },
+                "amount": {
+                    "description": "投票金额",
+                    "type": "string"
+                }
+            }
+        },
+        "types.BeanVoter": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "选民地址",
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "累积收益余额",
+                    "type": "string"
+                },
+                "burned": {
+                    "description": "已燃烧",
+                    "type": "string"
+                },
+                "mortgaged": {
+                    "description": "已抵押",
+                    "type": "string"
+                },
+                "redeem": {
+                    "description": "赎回标志",
+                    "type": "boolean"
+                },
+                "toMortgage": {
+                    "description": "待抵押",
+                    "type": "string"
+                },
+                "validator": {
+                    "description": "节点地址",
+                    "type": "string"
+                }
+            }
+        },
+        "types.BeanVots": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "节点公钥",
+                    "type": "string"
+                },
+                "voted": {
+                    "description": "选民贡献",
+                    "type": "string"
+                },
+                "voters": {
+                    "description": "选民列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.BeanVot"
+                    }
+                }
+            }
+        },
+        "types.DPOSPoolLog": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "description": "矿池余额",
+                    "type": "string"
+                },
+                "blockAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "去看高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "mined": {
+                    "description": "挖矿量",
+                    "type": "string"
+                },
+                "released": {
+                    "description": "实际释放量，实际释放量约等于挖矿量",
+                    "type": "string"
+                },
+                "total": {
+                    "description": "总股权",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DPOSRankLog": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "节点地址",
+                    "type": "string"
+                },
+                "blockAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "mortgaged": {
+                    "description": "节点抵押量",
+                    "type": "string"
+                },
+                "rank": {
+                    "description": "排名",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总股权",
+                    "type": "string"
+                },
+                "voted": {
+                    "description": "用户投票量",
+                    "type": "string"
+                },
+                "voters": {
+                    "description": "投票用户数",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.DPOSTcnLog": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "节点地址",
+                    "type": "string"
+                },
+                "blockAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "mortgaged": {
+                    "description": "节点抵押量",
+                    "type": "string"
+                },
+                "profit": {
+                    "description": "收益",
+                    "type": "string"
+                },
+                "voted": {
+                    "description": "用户投票量",
+                    "type": "string"
+                },
+                "voters": {
+                    "description": "投票用户数",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.DPOSTinLog": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "用户地址",
+                    "type": "string"
+                },
+                "blockAt": {
+                    "description": "区块时间",
+                    "type": "string"
+                },
+                "height": {
+                    "description": "区块高度",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "数据库自增id",
+                    "type": "integer"
+                },
+                "mortgaged": {
+                    "description": "用户抵押量",
+                    "type": "string"
+                },
+                "profit": {
+                    "description": "收益",
+                    "type": "string"
+                },
+                "validator": {
+                    "description": "用户选举的节点地址",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
