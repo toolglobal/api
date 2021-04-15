@@ -2,7 +2,7 @@
 
 [TOC]
 # 1. 概述
-本文档时mondo 链的api程序对外提供的api文档，api程序已开源用户可自行修改。api程序本身提供swag格式的文档输出（https://oloapi-test.wolot.io/docs/）。
+本文档时mondo 链的api程序对外提供的api文档，api程序已开源用户可自行修改。api程序本身提供swag格式的文档输出:https://oloapi-test.wolot.io/docs/
 
 调用链路：【用户】----http----【API】----RPC----【OLO CHAIN】
 如上所示，本API是在用户与区块链之间的桥梁，使得用户可以通过简单的http请求链的RPC接口，比如账户查询、交易等；同时，API程序沦陷OLO CHAIN，生成"leadger","transaction","payment"三种数据，提供给用户查询。
