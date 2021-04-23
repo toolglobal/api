@@ -7,12 +7,12 @@ endif
 .PHONY: build
 build:
 	export GOPROXY="https://goproxy.io,direct"
-	rm -rf ./bin && mkdir -p ./bin/config
-	go build -ldflags ${LDFLAGS} -o bin/api cmd/main.go
-	cp -r config/config.toml ./bin/config
-	cp -r static ./bin
+	rm -rf ./build && mkdir -p ./build/config
+	go build -ldflags ${LDFLAGS} -o build/api cmd/main.go
+	cp -r config/config.toml ./build/config
+	cp -r static ./build
 clean:
-	rm -rf ./bin
+	rm -rf ./build
 
 .PHONY: docs
 docs:

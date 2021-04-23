@@ -15,6 +15,7 @@ import (
 	"github.com/wolot/api/web/dbo"
 	"github.com/wolot/api/web/handlers"
 	"github.com/wolot/api/web/proxy"
+	"github.com/zsais/go-gin-prometheus"
 	"go.uber.org/zap"
 	"os"
 	"time"
@@ -63,7 +64,8 @@ func (s *Server) Start() {
 
 	// 开启metrics
 	if s.cfg.Metrics {
-		s.metrics = NewMetrics(router)
+		p := ginprometheus.NewPrometheus("gin")
+		p.Use(router)
 	}
 	router.Static("/static", "./static")
 	if s.cfg.Dev {
