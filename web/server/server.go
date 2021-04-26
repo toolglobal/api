@@ -46,7 +46,7 @@ func NewServer(logger *zap.Logger, cfg *config.Config, dbo3 *dbo.DBO) *Server {
 // @title MONDO API
 // @version 3.0.0
 // @description MONDO 区块链API文档
-// @host 47.241.15.2:8000
+// @host https://oloapi-test.wolot.io
 // @BasePath /
 func (s *Server) Start() {
 	// 生产环境可以使用 gin.New()
