@@ -107,6 +107,11 @@ func (s *Server) Start() {
 		contract.POST("/call", s.handler.ContractCallTx)     //call合约(evm本地执行，不消耗gas，不上链)
 	}
 
+	erc20Group := router.Group("/v2/erc20")
+	{
+		erc20Group.GET("/:token/balanceOf/:to", s.handler.BalanceOf)
+	}
+
 	v3 := router.Group("/v3")
 	{
 		v3.GET("/ledgers", s.handler.QueryV3Ledgers)
