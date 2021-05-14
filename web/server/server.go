@@ -11,6 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/wolot/api/config"
 	_ "github.com/wolot/api/docs"
+	"github.com/wolot/api/libs"
 	"github.com/wolot/api/libs/ginlimiter"
 	"github.com/wolot/api/web/dbo"
 	"github.com/wolot/api/web/handlers"
@@ -57,6 +58,9 @@ func (s *Server) Start() {
 
 	// 日志打印中间件
 	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/", "/metrics", "/health"}}))
+
+	// cross domain
+	router.Use(libs.Cors())
 
 	router.Any("/", func(context *gin.Context) {
 		context.String(200, "%s", "ok")
