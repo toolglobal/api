@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/hex"
 	"errors"
+	"github.com/wolot/api/utils"
 	"math/big"
 	"strings"
 	"sync/atomic"
@@ -125,7 +126,7 @@ func (tx *MultisigEvmTx) SigHash() ethcmn.Hash {
 		tx.Load,
 		tx.Memo,
 	})
-	v := rlpHash(message)
+	v := utils.RLPHash(message)
 	tx.sigHash.Store(v)
 	return v
 }
@@ -134,7 +135,7 @@ func (tx *MultisigEvmTx) Hash() ethcmn.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(ethcmn.Hash)
 	}
-	v := rlpHash(tx)
+	v := utils.RLPHash(tx)
 	tx.hash.Store(v)
 	return v
 }

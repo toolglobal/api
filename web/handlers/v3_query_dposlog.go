@@ -6,11 +6,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/gin-gonic/gin"
+	"github.com/wolot/api/mondo/model"
 	"github.com/wolot/api/mondo/types"
 	"strconv"
 )
 
-func getDPOSQuery(ctx *gin.Context) (*types.DPOSQuery, error) {
+func getDPOSQuery(ctx *gin.Context) (*types.DPosQuery, error) {
 	order := ctx.Query("order")
 	limit := ctx.Query("limit")
 	cursor := ctx.Query("cursor")
@@ -21,7 +22,7 @@ func getDPOSQuery(ctx *gin.Context) (*types.DPOSQuery, error) {
 	if len(address) > 0 && !types.ValidAddress(address) {
 		return nil, errors.New("invalid address")
 	}
-	var query types.DPOSQuery
+	var query types.DPosQuery
 	query.Order = order
 	query.Limit, _ = strconv.ParseUint(limit, 10, 64)
 	query.Cursor, _ = strconv.ParseUint(cursor, 10, 64)
@@ -102,7 +103,7 @@ func (hd *Handler) V3QueryPoolLogs(ctx *gin.Context) {
 		return
 	}
 
-	var data []types.DPOSPoolLog
+	var data []model.DPosPoolLog
 	_ = json.Unmarshal(resp.Data, &data)
 
 	hd.responseWrite(ctx, true, data)
@@ -146,7 +147,7 @@ func (hd *Handler) V3QueryTcnLogs(ctx *gin.Context) {
 		return
 	}
 
-	var data []types.DPOSTcnLog
+	var data []model.DPosTcnLog
 	_ = json.Unmarshal(resp.Data, &data)
 
 	hd.responseWrite(ctx, true, data)
@@ -190,7 +191,7 @@ func (hd *Handler) V3QueryTinLogs(ctx *gin.Context) {
 		return
 	}
 
-	var data []types.DPOSTinLog
+	var data []model.DPosTinLog
 	_ = json.Unmarshal(resp.Data, &data)
 
 	hd.responseWrite(ctx, true, data)
@@ -234,7 +235,7 @@ func (hd *Handler) V3QueryRankLogs(ctx *gin.Context) {
 		return
 	}
 
-	var data []types.DPOSRankLog
+	var data []model.DPosRankLog
 	_ = json.Unmarshal(resp.Data, &data)
 
 	hd.responseWrite(ctx, true, data)

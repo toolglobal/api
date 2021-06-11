@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-func TestMinePool_encode_decode(t *testing.T) {
-	var src MinePool
+func TestDPosPool_encode_decode(t *testing.T) {
+	var src DPosPool
 	src.GenesisTime = time.Now()
 	src.LastBlockHeight = 1024
 	src.LastBlockTime = time.Now().Add(time.Second * 12)
 
 	b := src.ToBytes()
 
-	var dst MinePool
+	var dst DPosPool
 	dst.FromBytes(b)
 
 	fmt.Println(src)

@@ -1,12 +1,14 @@
 package types
 
 import (
-	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/rlp"
 	"math/big"
 	"strings"
 	"sync/atomic"
+
+	ethcmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/wolot/api/utils"
 )
 
 // evm交易时sender和receiver都传public key，如果是合约帐户，receiver填写最后20个字节，前12字节填0
@@ -78,14 +80,14 @@ func (tx *TxEvm) SigHash() ethcmn.Hash {
 		tx.Body,
 	})
 
-	return rlpHash(message)
+	return utils.RLPHash(message)
 }
 
 func (tx *TxEvm) Hash() ethcmn.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(ethcmn.Hash)
 	}
-	v := rlpHash(tx)
+	v := utils.RLPHash(tx)
 	tx.hash.Store(v)
 	return v
 }

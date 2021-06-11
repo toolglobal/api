@@ -87,7 +87,7 @@ func (hd *Handler) signedBatchSendToCommitTx(ctx *gin.Context, sigTx *types.TxBa
 		response = make(map[string]interface{})
 	)
 	response["tx"] = sigTx.Hash().Hex()
-	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppBatch, txBytes...))
+	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppBatch[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxCommit", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())
@@ -117,7 +117,7 @@ func (hd *Handler) signedBatchSendToSyncTx(ctx *gin.Context, sigTx *types.TxBatc
 		response = make(map[string]interface{})
 	)
 	response["tx"] = sigTx.Hash().Hex()
-	result, err := hd.client.BroadcastTxSync(ctx, append(types.TxTagAppBatch, txBytes...))
+	result, err := hd.client.BroadcastTxSync(ctx, append(types.TxTagAppBatch[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxSync", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())
@@ -138,7 +138,7 @@ func (hd *Handler) signedBatchSendToAsyncTx(ctx *gin.Context, sigTx *types.TxBat
 		response = make(map[string]interface{})
 	)
 	response["tx"] = sigTx.Hash().Hex()
-	result, err := hd.client.BroadcastTxAsync(ctx, append(types.TxTagAppBatch, txBytes...))
+	result, err := hd.client.BroadcastTxAsync(ctx, append(types.TxTagAppBatch[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxAsync", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())

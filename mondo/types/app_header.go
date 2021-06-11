@@ -19,8 +19,25 @@ type AppHeader struct {
 	XStateRoot ethcmn.Hash    // fill after xstatedb commit
 	TxCount    uint64         // fill when ready to save
 	PrevHash   ethcmn.Hash    // global, just used to calculate header-hash
-	MinePool   *MinePool
-	Params     *Config
+	DPosPool   *DPosPool
+	Params     *Params
+}
+
+func (h *AppHeader) Copy() *AppHeader {
+	header := &AppHeader{
+		Height:     new(big.Int),
+		ClosedAt:   h.ClosedAt,
+		BlockHash:  h.BlockHash,
+		Validator:  h.Validator,
+		StateRoot:  h.StateRoot,
+		XStateRoot: h.XStateRoot,
+		TxCount:    h.TxCount,
+		PrevHash:   h.PrevHash,
+		DPosPool:   nil,
+		Params:     nil,
+	}
+
+	return header
 }
 
 func (h *AppHeader) String() string {
@@ -39,7 +56,7 @@ func (h *AppHeader) Hash() []byte {
 	s[1] = make([]byte, len(bz1))
 	copy(s[1], bz1)
 
-	bz2 := h.MinePool.ToBytes()
+	bz2 := h.DPosPool.ToBytes()
 	s[2] = make([]byte, len(bz2))
 	copy(s[2], bz2)
 

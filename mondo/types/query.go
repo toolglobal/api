@@ -30,13 +30,13 @@ type QueryBase struct {
 	End   uint64
 }
 
-type DPOSQuery struct {
+type DPosQuery struct {
 	QueryBase
 	Height  uint64
 	Address ethcmn.Address
 }
 
-func (q *DPOSQuery) ToBytes() []byte {
+func (q *DPosQuery) ToBytes() []byte {
 	bz, err := rlp.EncodeToBytes(q)
 	if err != nil {
 		panic(err)
@@ -44,6 +44,20 @@ func (q *DPOSQuery) ToBytes() []byte {
 	return bz
 }
 
-func (q *DPOSQuery) FromBytes(bz []byte) error {
+func (q *DPosQuery) FromBytes(bz []byte) error {
 	return rlp.DecodeBytes(bz, q)
+}
+
+func (q *DPosQuery) GetQuery(bz []byte) error {
+	if err := q.FromBytes(bz); err != nil {
+		return err
+	}
+	if q.Order == "" {
+		q.Order = "DESC"
+	}
+	if q.Limit == 0 {
+		q.Limit = 10
+	}
+
+	return nil
 }

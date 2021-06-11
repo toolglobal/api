@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
@@ -59,83 +58,76 @@ func (cli *Client) GetV3BlockData(height int64) (*V3BlockData, error) {
 			log.Logger.Warn("error tx", zap.ByteString("tx", bs))
 			continue
 		}
-		switch {
-		case bytes.HasPrefix(bs, types.TxTagAppEvm):
+
+		tag, itx, err := types.DecodeTx(bs)
+		if err != nil {
+			return nil, err
+		}
+
+		switch tag {
+		case types.TxTagAppEvm:
 			{
-				var tx types.TxEvm
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxEvm); ok {
+					transaction, payments := cli.DecodeTxAppEvm(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxAppEvm(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagAppBatch):
+		case types.TxTagEthereumTx:
 			{
-				var tx types.TxBatch
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*ethtypes.Transaction); ok {
+					transaction, payments := cli.DecodeTxAppEthereum(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxAppBatch(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagNodeDelegate):
+		case types.TxTagAppBatch:
 			{
-				var tx types.TxNodeDelegate
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxBatch); ok {
+					transaction, payments := cli.DecodeTxAppBatch(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxNodeDelegate(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagUserDelegate):
+		case types.TxTagNodeDelegate:
 			{
-				var tx types.TxUserDelegate
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxNodeDelegate); ok {
+					transaction, payments := cli.DecodeTxNodeDelegate(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxUserDelegate(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagAppEvmMultisig):
+		case types.TxTagUserDelegate:
 			{
-				var tx types.MultisigEvmTx
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxUserDelegate); ok {
+					transaction, payments := cli.DecodeTxUserDelegate(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxMultisigEvm(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagAppParams):
+		case types.TxTagAppEvmMultisig:
 			{
-				var tx types.TxParams
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.MultisigEvmTx); ok {
+					transaction, payments := cli.DecodeTxMultisigEvm(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxParams(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagAppMgr):
+		case types.TxTagAppParams:
 			{
-				var tx types.TxManage
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxParams); ok {
+					transaction, payments := cli.DecodeTxParams(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxManage(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
+			}
+		case types.TxTagAppMgr:
+			{
+				if tx, ok := itx.(*types.TxManage); ok {
+					transaction, payments := cli.DecodeTxManage(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
+				}
 			}
 		default:
 			log.Logger.Warn("unknown txTag", zap.Int("txTag", txTagToTypei(bs[:2])))
@@ -157,7 +149,7 @@ func (cli *Client) DecodeTxAppEvm(tx *types.TxEvm, block *tmtypes.Block, deliver
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppEvm),
+		Typei:     txTagToTypei(types.TxTagAppEvm[:]),
 		Types:     "TxTagAppEvm",
 		Sender:    tx.Sender.ToAddress().Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -206,12 +198,78 @@ func (cli *Client) DecodeTxAppEvm(tx *types.TxEvm, block *tmtypes.Block, deliver
 	return trans, payments
 }
 
+func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
+	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
+	to := tx.To()
+	if to == nil {
+		to = &common.Address{}
+	}
+
+	signer := ethtypes.NewEIP155Signer(tx.ChainId())
+	sender, err := signer.Sender(tx)
+	if err != nil {
+		log.Logger.Error("DecodeTxAppEthereum", zap.Error(err))
+		return nil, nil
+	}
+
+	trans := &database.V3Transaction{
+		Hash:      tx.Hash().Hex(),
+		Height:    block.Height,
+		Typei:     txTagToTypei(types.TxTagEthereumTx[:]),
+		Types:     "TxTagEthereumTx",
+		Sender:    sender.Hex(),
+		Nonce:     int64(tx.Nonce()),
+		Receiver:  to.Hex(),
+		Value:     tx.Value().String(),
+		GasLimit:  int64(tx.Gas()),
+		GasUsed:   deliverResult.GasUsed,
+		GasPrice:  tx.GasPrice().String(),
+		Memo:      "",
+		Payload:   hex.EncodeToString(tx.Data()),
+		Events:    deliverResult.GetInfo(),
+		Codei:     deliverResult.Code,
+		Codes:     deliverResult.Log,
+		CreatedAt: block.Time,
+	}
+	ledger.GasLimit += int64(tx.Gas())
+	ledger.GasUsed += deliverResult.GasUsed
+	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, tx.GasPrice())
+
+	if deliverResult.Code != 0 {
+		return trans, nil
+	}
+
+	var (
+		payments []database.V3Payment
+	)
+
+	if tx.Value().Cmp(new(big.Int)) > 0 {
+		payments = append(payments, database.V3Payment{
+			Hash:      tx.Hash().Hex(),
+			Height:    block.Height,
+			Idx:       0,
+			Sender:    sender.Hex(),
+			Receiver:  to.Hex(),
+			Symbol:    "OLO",
+			Contract:  common.Address{}.Hex(),
+			Value:     tx.Value().String(),
+			CreatedAt: block.Time,
+		})
+	}
+	subPays, err := cli.resolveTxEvents(trans)
+	if err != nil {
+		return trans, payments
+	}
+	payments = append(payments, subPays...)
+	return trans, payments
+}
+
 func (cli *Client) DecodeTxMultisigEvm(tx *types.MultisigEvmTx, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
 	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppEvmMultisig),
+		Typei:     txTagToTypei(types.TxTagAppEvmMultisig[:]),
 		Types:     "TxTagAppEvmMultisig",
 		Sender:    tx.From.Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -265,7 +323,7 @@ func (cli *Client) DecodeTxAppBatch(tx *types.TxBatch, block *tmtypes.Block, del
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppBatch),
+		Typei:     txTagToTypei(types.TxTagAppBatch[:]),
 		Types:     "TxTagAppBatch",
 		Sender:    tx.Sender.ToAddress().Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -346,7 +404,7 @@ func (cli *Client) DecodeTxNodeDelegate(tx *types.TxNodeDelegate, block *tmtypes
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagNodeDelegate),
+		Typei:     txTagToTypei(types.TxTagNodeDelegate[:]),
 		Types:     "TxTagNodeDelegate",
 		Sender:    tx.Sender.Address().String(),
 		Nonce:     int64(tx.Nonce),
@@ -389,7 +447,7 @@ func (cli *Client) DecodeTxUserDelegate(tx *types.TxUserDelegate, block *tmtypes
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagUserDelegate),
+		Typei:     txTagToTypei(types.TxTagUserDelegate[:]),
 		Types:     "TxTagUserDelegate",
 		Sender:    tx.Sender.ToAddress().Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -418,7 +476,7 @@ func (cli *Client) DecodeTxManage(tx *types.TxManage, block *tmtypes.Block, deli
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppMgr),
+		Typei:     txTagToTypei(types.TxTagAppMgr[:]),
 		Types:     "TxTagAppMgr",
 		Sender:    tx.Sender.Address().String(),
 		Nonce:     int64(tx.Nonce),
@@ -447,7 +505,7 @@ func (cli *Client) DecodeTxParams(tx *types.TxParams, block *tmtypes.Block, deli
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppParams),
+		Typei:     txTagToTypei(types.TxTagAppParams[:]),
 		Types:     "TxTagAppParams",
 		Sender:    tx.Sender.Address().String(),
 		Nonce:     int64(tx.Nonce),

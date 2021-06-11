@@ -62,7 +62,7 @@ func (hd *Handler) signedDelegateSendToCommitTx(ctx *gin.Context, sigTx *types.T
 	)
 	response["tx"] = sigTx.Hash().Hex()
 
-	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagUserDelegate, txBytes...))
+	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagUserDelegate[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxCommit", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())

@@ -6,6 +6,7 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/wolot/api/utils"
 )
 
 type TxManage struct {
@@ -74,7 +75,7 @@ func (tx *TxManage) Hash() ethcmn.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(ethcmn.Hash)
 	}
-	v := rlpHash(tx)
+	v := utils.RLPHash(tx)
 	tx.hash.Store(v)
 	return v
 }

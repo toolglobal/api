@@ -1,12 +1,14 @@
 package types
 
 import (
-	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/rlp"
 	"math/big"
 	"strings"
 	"sync/atomic"
+
+	ethcmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/wolot/api/utils"
 )
 
 type TxUserDelegate struct {
@@ -69,7 +71,7 @@ func (tx *TxUserDelegate) SigHash() ethcmn.Hash {
 		tx.Receiver,
 	})
 
-	return rlpHash(message)
+	return utils.RLPHash(message)
 }
 
 func (tx *TxUserDelegate) ToBytes() []byte {
@@ -85,7 +87,7 @@ func (tx *TxUserDelegate) Hash() ethcmn.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(ethcmn.Hash)
 	}
-	v := rlpHash(tx)
+	v := utils.RLPHash(tx)
 	tx.hash.Store(v)
 	return v
 }

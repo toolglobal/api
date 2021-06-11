@@ -2,7 +2,7 @@ bind = ":8889"
 rpc = "127.0.0.1:26657"
 dev = true
 metrics = true
-startHeight = 169343
+startHeight = 1
 versions = [3]
 
 [limiter]

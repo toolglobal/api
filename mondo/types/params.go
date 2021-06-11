@@ -1,8 +1,13 @@
 package types
 
-import "github.com/tendermint/go-amino"
+import (
+	"fmt"
 
-type Config struct {
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/tendermint/go-amino"
+)
+
+type Params struct {
 	DPOSBeginHeight  int64 // 从此高度开启DPOS机制 必须>1
 	DPOSEachHeight   int64 // 每多少高度清算一次 10240
 	DPOSMaxNodeNum   int   // 超级节点数量
@@ -14,7 +19,7 @@ type Config struct {
 	UpgradeHeight    int64 // 升级高度，如果不为0，在此高度的EndBlock会Panic等待升级
 }
 
-var DefaultConfig = Config{
+var DefaultParams = Params{
 	DPOSBeginHeight:  150000,
 	DPOSEachHeight:   20480,
 	DPOSMaxNodeNum:   13,
@@ -26,16 +31,44 @@ var DefaultConfig = Config{
 	UpgradeHeight:    0,
 }
 
-func (p *Config) FromBytes(bz []byte) {
+func (p *Params) FromBytes(bz []byte) {
 	if err := amino.UnmarshalBinaryBare(bz, p); err != nil {
 		panic(err)
 	}
 }
 
-func (p *Config) ToBytes() []byte {
+func (p *Params) ToBytes() []byte {
 	buf, err := amino.MarshalBinaryBare(p)
 	if err != nil {
 		panic(err)
 	}
 	return buf
+}
+
+var (
+	mondoConfig = []byte("mondoConfig")
+)
+
+func LoadMondoParams(db ethdb.Database) *Params {
+	var cfg Params
+	buf, _ := db.Get(mondoConfig)
+	if len(buf) != 0 {
+		if err := amino.UnmarshalBinaryBare(buf, &cfg); err != nil {
+			panic(fmt.Sprintf("UnmarshalBinaryBare %v", err))
+		}
+		return &cfg
+	}
+
+	return nil
+}
+
+func SaveMondoParams(db ethdb.Database, cfg *Params) {
+	buf, err := amino.MarshalBinaryBare(cfg)
+	if err != nil {
+		panic(fmt.Sprintf("MarshalBinaryBare %v", err))
+	}
+
+	if err := db.Put(mondoConfig, buf); err != nil {
+		panic(fmt.Sprintf("chaindb.Put %v", err))
+	}
 }

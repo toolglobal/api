@@ -43,6 +43,12 @@ func (pk PublicKey) VerifyBytes(msg, signature []byte) bool {
 	return true
 }
 
+func (pk PublicKey) Copy() PublicKey {
+	p := PublicKey{}
+	p.SetBytes(pk[:])
+	return p
+}
+
 // unsafe 兼容老版本
 func (pk PublicKey) ToAddress() Address {
 	if pk.IsAddress() {
@@ -62,56 +68,56 @@ func (pk PublicKey) ToAddress() Address {
 }
 
 // unsafe 前13个字节都是0
-func (a PublicKey) IsAddress() bool {
+func (pk PublicKey) IsAddress() bool {
 	for i := 0; i < 13; i++ {
-		if a[i] != 0 {
+		if pk[i] != 0 {
 			return false
 		}
 	}
 	return true
 }
 
-func (a PublicKey) Bytes() []byte { return a[:] }
+func (pk PublicKey) Bytes() []byte { return pk[:] }
 
-func (a PublicKey) Big() *big.Int { return new(big.Int).SetBytes(a[:]) }
+func (pk PublicKey) Big() *big.Int { return new(big.Int).SetBytes(pk[:]) }
 
-func (a PublicKey) Hex() string {
-	return hexutil.Encode(a[:])
+func (pk PublicKey) Hex() string {
+	return hexutil.Encode(pk[:])
 }
 
 // String implements fmt.Stringer.
-func (a PublicKey) String() string {
-	return a.Hex()
+func (pk PublicKey) String() string {
+	return pk.Hex()
 }
 
 // Format implements fmt.Formatter, forcing the byte slice to be formatted as is,
 // without going through the stringer interface used for logging.
-func (a PublicKey) Format(s fmt.State, c rune) {
-	fmt.Fprintf(s, "%"+string(c), a[:])
+func (pk PublicKey) Format(s fmt.State, c rune) {
+	fmt.Fprintf(s, "%"+string(c), pk[:])
 }
 
 // SetBytes sets the address to the value of b.
-// If b is larger than len(a) it will panic.
-func (a *PublicKey) SetBytes(b []byte) {
-	if len(b) > len(a) {
+// If b is larger than len(pk) it will panic.
+func (pk *PublicKey) SetBytes(b []byte) {
+	if len(b) > len(pk) {
 		b = b[len(b)-PubKeyLength:]
 	}
-	copy(a[PubKeyLength-len(b):], b)
+	copy(pk[PubKeyLength-len(b):], b)
 }
 
-// MarshalText returns the hex representation of a.
-func (a PublicKey) MarshalText() ([]byte, error) {
-	return hexutil.Bytes(a[:]).MarshalText()
+// MarshalText returns the hex representation of pk.
+func (pk PublicKey) MarshalText() ([]byte, error) {
+	return hexutil.Bytes(pk[:]).MarshalText()
 }
 
-// UnmarshalText parses a hash in hex syntax.
-func (a *PublicKey) UnmarshalText(input []byte) error {
-	return hexutil.UnmarshalFixedText("Address", input, a[:])
+// UnmarshalText parses pk hash in hex syntax.
+func (pk *PublicKey) UnmarshalText(input []byte) error {
+	return hexutil.UnmarshalFixedText("Address", input, pk[:])
 }
 
-// UnmarshalJSON parses a hash in hex syntax.
-func (a *PublicKey) UnmarshalJSON(input []byte) error {
-	return hexutil.UnmarshalFixedJSON(addressT, input, a[:])
+// UnmarshalJSON parses pk hash in hex syntax.
+func (pk *PublicKey) UnmarshalJSON(input []byte) error {
+	return hexutil.UnmarshalFixedJSON(addressT, input, pk[:])
 }
 
 func HexToPubkey(s string) (PublicKey, error) {
