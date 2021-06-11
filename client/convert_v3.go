@@ -16,6 +16,7 @@ import (
 	"github.com/wolot/api/database"
 	"github.com/wolot/api/libs/log"
 	"github.com/wolot/api/mondo/types"
+	"github.com/wolot/api/utils"
 	"go.uber.org/zap"
 	"math/big"
 	"strconv"
@@ -212,6 +213,9 @@ func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.
 		return nil, nil
 	}
 
+	value := utils.ToEther(tx.Value())
+	gasPrice := utils.ToEther(tx.GasPrice())
+
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
@@ -220,10 +224,10 @@ func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.
 		Sender:    sender.Hex(),
 		Nonce:     int64(tx.Nonce()),
 		Receiver:  to.Hex(),
-		Value:     tx.Value().String(),
+		Value:     value.String(),
 		GasLimit:  int64(tx.Gas()),
 		GasUsed:   deliverResult.GasUsed,
-		GasPrice:  tx.GasPrice().String(),
+		GasPrice:  gasPrice.String(),
 		Memo:      "",
 		Payload:   hex.EncodeToString(tx.Data()),
 		Events:    deliverResult.GetInfo(),
@@ -233,7 +237,7 @@ func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.
 	}
 	ledger.GasLimit += int64(tx.Gas())
 	ledger.GasUsed += deliverResult.GasUsed
-	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, tx.GasPrice())
+	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, gasPrice)
 
 	if deliverResult.Code != 0 {
 		return trans, nil
@@ -252,7 +256,7 @@ func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.
 			Receiver:  to.Hex(),
 			Symbol:    "OLO",
 			Contract:  common.Address{}.Hex(),
-			Value:     tx.Value().String(),
+			Value:     value.String(),
 			CreatedAt: block.Time,
 		})
 	}
