@@ -1,4 +1,4 @@
-module github.com/wolot/api
+module github.com/toolglobal/api
 
 go 1.14
 
@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/axengine/cache v1.2.0
 	github.com/axengine/httpc v0.0.2
-	github.com/ethereum/go-ethereum v1.9.9
+	github.com/ethereum/go-ethereum v1.10.3
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.6.2
 	github.com/huzhongqing/ginprom v0.1.1
@@ -26,6 +26,6 @@ require (
 	github.com/tendermint/tendermint v0.34.10
 	github.com/zsais/go-gin-prometheus v0.1.0
 	go.uber.org/zap v1.13.0
-	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )

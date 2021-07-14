@@ -1,7 +1,7 @@
 package dbo
 
 import (
-	"github.com/wolot/api/datamanager"
+	"github.com/toolglobal/api/datamanager"
 )
 
 type DBO struct {

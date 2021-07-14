@@ -2,7 +2,7 @@ package bean
 
 import (
 	"github.com/pkg/errors"
-	"github.com/wolot/api/mondo/types"
+	"github.com/toolglobal/api/mondo/types"
 )
 
 const (

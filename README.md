@@ -2,7 +2,7 @@
 
 ## Install
 ```shell
-git clone https://github.com/wolot/api.git
+git clone https://github.com/toolglobal/api.git
 cd api && make
 cd build && ./api
 ```

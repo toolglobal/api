@@ -1,7 +1,7 @@
 package datamanager
 
 import (
-	"github.com/wolot/api/database"
+	"github.com/toolglobal/api/database"
 )
 
 func (m *DataManager) AddV3Ledger(data *database.V3Ledger) (uint64, error) {

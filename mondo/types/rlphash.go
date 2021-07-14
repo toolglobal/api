@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-func rlpHash(x interface{}) (h ethcmn.Hash) {
+func RLPHash(x interface{}) (h ethcmn.Hash) {
 	hw := sha3.NewLegacyKeccak256()
 	rlp.Encode(hw, x)
 	hw.Sum(h[:0])

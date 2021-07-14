@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/tendermint/tendermint/rpc/client/http"
-	"github.com/wolot/api/config"
-	"github.com/wolot/api/web/dbo"
+	"github.com/toolglobal/api/config"
+	"github.com/toolglobal/api/web/dbo"
 	"go.uber.org/zap"
 	"sync"
 )

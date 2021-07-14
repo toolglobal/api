@@ -7,9 +7,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/gin-gonic/gin"
-	"github.com/wolot/api/mondo/types"
-	"github.com/wolot/api/utils"
-	"github.com/wolot/api/web/bean"
+	"github.com/toolglobal/api/mondo/types"
+	"github.com/toolglobal/api/utils"
+	"github.com/toolglobal/api/web/bean"
 	"go.uber.org/zap"
 	"math/big"
 	"time"
@@ -79,11 +79,11 @@ func (hd *Handler) SignedEvmTransaction(ctx *gin.Context) {
 
 	switch tdata.Mode {
 	case bean.MODE_ASYNC:
-		hd.signedEvmSendToAsyncTx(ctx, types.TxTagAppEvm, tx)
+		hd.signedEvmSendToAsyncTx(ctx, types.TxTagAppEvm[:], tx)
 	case bean.MODE_SYNC:
-		hd.signedEvmSendToSyncTx(ctx, types.TxTagAppEvm, tx)
+		hd.signedEvmSendToSyncTx(ctx, types.TxTagAppEvm[:], tx)
 	default:
-		hd.signedEvmSendToCommitTx(ctx, types.TxTagAppEvm, tx)
+		hd.signedEvmSendToCommitTx(ctx, types.TxTagAppEvm[:], tx)
 	}
 }
 
@@ -219,7 +219,7 @@ func (hd *Handler) contractDeployCommitTx(ctx *gin.Context, sigTx *types.TxEvm) 
 	response["tx"] = sigTx.Hash().Hex()
 	response["address"] = crypto.CreateAddress(sigTx.Sender.ToAddress().Address, sigTx.Nonce).Hex()
 
-	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppEvm, txBytes...))
+	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppEvm[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxCommit", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())
@@ -459,7 +459,7 @@ func (hd *Handler) contractInvokeCommitTx(ctx *gin.Context, sigTx *types.TxEvm) 
 	)
 	response["tx"] = sigTx.Hash().Hex()
 
-	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppEvm, txBytes...))
+	result, err := hd.client.BroadcastTxCommit(ctx, append(types.TxTagAppEvm[:], txBytes...))
 	if err != nil {
 		hd.logger.Error("BroadcastTxCommit", zap.Error(err))
 		hd.responseWriteV2(ctx, false, response, err.Error())
@@ -605,11 +605,11 @@ func (hd *Handler) SignedEvmMutlisigTransaction(ctx *gin.Context) {
 
 	switch tdata.Mode {
 	case bean.MODE_ASYNC:
-		hd.signedEvmSendToAsyncTx(ctx, types.TxTagAppEvmMultisig, tx)
+		hd.signedEvmSendToAsyncTx(ctx, types.TxTagAppEvmMultisig[:], tx)
 	case bean.MODE_SYNC:
-		hd.signedEvmSendToSyncTx(ctx, types.TxTagAppEvmMultisig, tx)
+		hd.signedEvmSendToSyncTx(ctx, types.TxTagAppEvmMultisig[:], tx)
 	default:
-		hd.signedEvmSendToCommitTx(ctx, types.TxTagAppEvmMultisig, tx)
+		hd.signedEvmSendToCommitTx(ctx, types.TxTagAppEvmMultisig[:], tx)
 	}
 }
 

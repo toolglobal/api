@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/wolot/api/database"
+	"github.com/toolglobal/api/database"
 	"go.uber.org/zap"
 	"path"
 )

@@ -1,25 +1,22 @@
 package client
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/shopspring/decimal"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/wolot/api/database"
-	"github.com/wolot/api/libs/log"
-	"github.com/wolot/api/mondo/types"
+	"github.com/toolglobal/api/database"
+	"github.com/toolglobal/api/libs/log"
+	"github.com/toolglobal/api/mondo/types"
+	"github.com/toolglobal/api/utils"
 	"go.uber.org/zap"
 	"math/big"
-	"strconv"
 )
 
 type V3BlockData struct {
@@ -59,83 +56,44 @@ func (cli *Client) GetV3BlockData(height int64) (*V3BlockData, error) {
 			log.Logger.Warn("error tx", zap.ByteString("tx", bs))
 			continue
 		}
-		switch {
-		case bytes.HasPrefix(bs, types.TxTagAppEvm):
+
+		tag, itx, err := types.DecodeTx(bs)
+		if err != nil {
+			return nil, err
+		}
+
+		switch tag {
+		case types.TxTagAppEvm:
 			{
-				var tx types.TxEvm
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxEvm); ok {
+					transaction, payments := cli.DecodeTxAppEvm(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxAppEvm(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagAppBatch):
+		case types.TxTagEthereumTx:
 			{
-				var tx types.TxBatch
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*ethtypes.Transaction); ok {
+					transaction, payments := cli.DecodeTxAppEthereum(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxAppBatch(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagNodeDelegate):
+		case types.TxTagAppBatch:
 			{
-				var tx types.TxNodeDelegate
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.TxBatch); ok {
+					transaction, payments := cli.DecodeTxAppBatch(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxNodeDelegate(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
-		case bytes.HasPrefix(bs, types.TxTagUserDelegate):
+		case types.TxTagAppEvmMultisig:
 			{
-				var tx types.TxUserDelegate
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
+				if tx, ok := itx.(*types.MultisigEvmTx); ok {
+					transaction, payments := cli.DecodeTxMultisigEvm(tx, blockResult.Block, deliverResult[txIdx], data.ledger)
+					data.txs = append(data.txs, *transaction)
+					data.payments = append(data.payments, payments...)
 				}
-				transaction, payments := cli.DecodeTxUserDelegate(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
-			}
-		case bytes.HasPrefix(bs, types.TxTagAppEvmMultisig):
-			{
-				var tx types.MultisigEvmTx
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
-				}
-				transaction, payments := cli.DecodeTxMultisigEvm(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
-			}
-		case bytes.HasPrefix(bs, types.TxTagAppParams):
-			{
-				var tx types.TxParams
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
-				}
-				transaction, payments := cli.DecodeTxParams(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
-			}
-		case bytes.HasPrefix(bs, types.TxTagAppMgr):
-			{
-				var tx types.TxManage
-				if err := tx.FromBytes(bs[2:]); err != nil {
-					log.Logger.Warn("FromBytes", zap.Error(err), zap.ByteString("tx", bs[2:]))
-					continue
-				}
-				transaction, payments := cli.DecodeTxManage(&tx, blockResult.Block, deliverResult[txIdx], data.ledger)
-				data.txs = append(data.txs, *transaction)
-				data.payments = append(data.payments, payments...)
 			}
 		default:
 			log.Logger.Warn("unknown txTag", zap.Int("txTag", txTagToTypei(bs[:2])))
@@ -157,7 +115,7 @@ func (cli *Client) DecodeTxAppEvm(tx *types.TxEvm, block *tmtypes.Block, deliver
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppEvm),
+		Typei:     txTagToTypei(types.TxTagAppEvm[:]),
 		Types:     "TxTagAppEvm",
 		Sender:    tx.Sender.ToAddress().Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -206,12 +164,81 @@ func (cli *Client) DecodeTxAppEvm(tx *types.TxEvm, block *tmtypes.Block, deliver
 	return trans, payments
 }
 
+func (cli *Client) DecodeTxAppEthereum(tx *ethtypes.Transaction, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
+	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
+	to := tx.To()
+	if to == nil {
+		to = &common.Address{}
+	}
+
+	signer := ethtypes.NewEIP155Signer(tx.ChainId())
+	sender, err := signer.Sender(tx)
+	if err != nil {
+		log.Logger.Error("DecodeTxAppEthereum", zap.Error(err))
+		return nil, nil
+	}
+
+	value := utils.ToEther(tx.Value())
+	gasPrice := utils.ToEther(tx.GasPrice())
+
+	trans := &database.V3Transaction{
+		Hash:      tx.Hash().Hex(),
+		Height:    block.Height,
+		Typei:     txTagToTypei(types.TxTagEthereumTx[:]),
+		Types:     "TxTagEthereumTx",
+		Sender:    sender.Hex(),
+		Nonce:     int64(tx.Nonce()),
+		Receiver:  to.Hex(),
+		Value:     value.String(),
+		GasLimit:  int64(tx.Gas()),
+		GasUsed:   deliverResult.GasUsed,
+		GasPrice:  gasPrice.String(),
+		Memo:      "",
+		Payload:   hex.EncodeToString(tx.Data()),
+		Events:    deliverResult.GetInfo(),
+		Codei:     deliverResult.Code,
+		Codes:     deliverResult.Log,
+		CreatedAt: block.Time,
+	}
+	ledger.GasLimit += int64(tx.Gas())
+	ledger.GasUsed += deliverResult.GasUsed
+	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, gasPrice)
+
+	if deliverResult.Code != 0 {
+		return trans, nil
+	}
+
+	var (
+		payments []database.V3Payment
+	)
+
+	if tx.Value().Cmp(new(big.Int)) > 0 {
+		payments = append(payments, database.V3Payment{
+			Hash:      tx.Hash().Hex(),
+			Height:    block.Height,
+			Idx:       0,
+			Sender:    sender.Hex(),
+			Receiver:  to.Hex(),
+			Symbol:    "OLO",
+			Contract:  common.Address{}.Hex(),
+			Value:     value.String(),
+			CreatedAt: block.Time,
+		})
+	}
+	subPays, err := cli.resolveTxEvents(trans)
+	if err != nil {
+		return trans, payments
+	}
+	payments = append(payments, subPays...)
+	return trans, payments
+}
+
 func (cli *Client) DecodeTxMultisigEvm(tx *types.MultisigEvmTx, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
 	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppEvmMultisig),
+		Typei:     txTagToTypei(types.TxTagAppEvmMultisig[:]),
 		Types:     "TxTagAppEvmMultisig",
 		Sender:    tx.From.Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -265,7 +292,7 @@ func (cli *Client) DecodeTxAppBatch(tx *types.TxBatch, block *tmtypes.Block, del
 	trans := &database.V3Transaction{
 		Hash:      tx.Hash().Hex(),
 		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppBatch),
+		Typei:     txTagToTypei(types.TxTagAppBatch[:]),
 		Types:     "TxTagAppBatch",
 		Sender:    tx.Sender.ToAddress().Hex(),
 		Nonce:     int64(tx.Nonce),
@@ -305,169 +332,6 @@ func (cli *Client) DecodeTxAppBatch(tx *types.TxBatch, block *tmtypes.Block, del
 	}
 
 	return trans, payments
-}
-
-func (cli *Client) DecodeTxNodeDelegate(tx *types.TxNodeDelegate, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
-	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
-
-	var (
-		receiver string
-		memo     string
-	)
-	switch tx.OpType {
-	case types.NODE_OPTYPE_MORTGAGE:
-		memo = fmt.Sprintf("node delegate opType:%d(%s) opValue:%s", tx.OpType, "MORTGAGE", tx.OpValue.String())
-	case types.NODE_OPTYPE_REEDEM:
-		memo = fmt.Sprintf("node delegate opType:%d(%s) opValue:%s", tx.OpType, "REEDEM", tx.OpValue.String())
-	case types.NODE_OPTYPE_COLLECT:
-		memo = fmt.Sprintf("node delegate opType:%d(%s) opValue:%s", tx.OpType, "COLLECT", tx.OpValue.String())
-	case types.NODE_OPTYPE_WITHDRAW:
-		memo = fmt.Sprintf("node delegate opType:%d(%s) opValue:%s", tx.OpType, "WITHDRAW", tx.OpValue.String())
-		receiver = common.BytesToAddress(tx.Receiver).Hex()
-	}
-
-	// todo 为什么deliverResult会是nil?
-	var (
-		gasUsed int64
-		codei   uint32
-		codes   string
-	)
-	if deliverResult == nil {
-		gasUsed = 0
-		codei = 0
-		codes = ""
-		log.Logger.Warn("DecodeTxNodeDelegate deliverResult is null", zap.Int64("height", block.Height))
-	} else {
-		gasUsed = deliverResult.GasUsed
-		codei = deliverResult.Code
-		codes = deliverResult.Log
-	}
-
-	trans := &database.V3Transaction{
-		Hash:      tx.Hash().Hex(),
-		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagNodeDelegate),
-		Types:     "TxTagNodeDelegate",
-		Sender:    tx.Sender.Address().String(),
-		Nonce:     int64(tx.Nonce),
-		Receiver:  receiver,
-		Value:     tx.OpValue.String(),
-		GasLimit:  21000,
-		GasUsed:   gasUsed,
-		GasPrice:  "1",
-		Memo:      memo,
-		Payload:   "",
-		Events:    "",
-		Codei:     codei,
-		Codes:     codes,
-		CreatedAt: block.Time,
-	}
-	ledger.GasLimit += int64(0)
-	ledger.GasUsed += gasUsed
-	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, new(big.Int).SetUint64(1))
-
-	return trans, nil
-}
-
-func (cli *Client) DecodeTxUserDelegate(tx *types.TxUserDelegate, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
-	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
-
-	var (
-		receiver string
-		memo     string
-	)
-	switch tx.OpType {
-	case types.USER_OPTYPE_MORTGAGE:
-		memo = fmt.Sprintf("user delegate opType:%d(%s) opValue:%s", tx.OpType, "MORTGAGE", tx.OpValue.String())
-		receiver = crypto.Address(tx.Receiver).String()
-	case types.USER_OPTYPE_REEDEM:
-		memo = fmt.Sprintf("user delegate opType:%d(%s) opValue:%s", tx.OpType, "REEDEM", tx.OpValue.String())
-	case types.USER_OPTYPE_COLLECT:
-		memo = fmt.Sprintf("user delegate opType:%d(%s) opValue:%s", tx.OpType, "COLLECT", tx.OpValue.String())
-	}
-
-	trans := &database.V3Transaction{
-		Hash:      tx.Hash().Hex(),
-		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagUserDelegate),
-		Types:     "TxTagUserDelegate",
-		Sender:    tx.Sender.ToAddress().Hex(),
-		Nonce:     int64(tx.Nonce),
-		Receiver:  receiver,
-		Value:     tx.OpValue.String(),
-		GasLimit:  21000,
-		GasUsed:   deliverResult.GasUsed,
-		GasPrice:  "1",
-		Memo:      memo,
-		Payload:   "",
-		Events:    "",
-		Codei:     deliverResult.Code,
-		Codes:     deliverResult.Log,
-		CreatedAt: block.Time,
-	}
-	ledger.GasLimit += int64(0)
-	ledger.GasUsed += deliverResult.GasUsed
-	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, new(big.Int).SetUint64(1))
-
-	return trans, nil
-}
-
-func (cli *Client) DecodeTxManage(tx *types.TxManage, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
-	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
-
-	trans := &database.V3Transaction{
-		Hash:      tx.Hash().Hex(),
-		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppMgr),
-		Types:     "TxTagAppMgr",
-		Sender:    tx.Sender.Address().String(),
-		Nonce:     int64(tx.Nonce),
-		Receiver:  tx.Receiver.Address().String(),
-		Value:     strconv.FormatUint(tx.OpValue, 10),
-		GasLimit:  0,
-		GasUsed:   deliverResult.GasUsed,
-		GasPrice:  "1",
-		Memo:      fmt.Sprintf("manage opType:%d opValue:%d", tx.OpType, tx.OpValue),
-		Payload:   "",
-		Events:    "",
-		Codei:     deliverResult.Code,
-		Codes:     deliverResult.Log,
-		CreatedAt: block.Time,
-	}
-	ledger.GasLimit += int64(0)
-	ledger.GasUsed += deliverResult.GasUsed
-	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, new(big.Int).SetUint64(1))
-
-	return trans, nil
-}
-
-func (cli *Client) DecodeTxParams(tx *types.TxParams, block *tmtypes.Block, deliverResult *abcitypes.ResponseDeliverTx,
-	ledger *database.V3Ledger) (*database.V3Transaction, []database.V3Payment) {
-
-	trans := &database.V3Transaction{
-		Hash:      tx.Hash().Hex(),
-		Height:    block.Height,
-		Typei:     txTagToTypei(types.TxTagAppParams),
-		Types:     "TxTagAppParams",
-		Sender:    tx.Sender.Address().String(),
-		Nonce:     int64(tx.Nonce),
-		Receiver:  string(tx.Key),
-		Value:     string(tx.Value),
-		GasLimit:  0,
-		GasUsed:   deliverResult.GasUsed,
-		GasPrice:  "1",
-		Memo:      fmt.Sprintf("param set name:%s value:%s", tx.Key, tx.Value),
-		Payload:   "",
-		Events:    "",
-		Codei:     deliverResult.Code,
-		Codes:     deliverResult.Log,
-		CreatedAt: block.Time,
-	}
-	ledger.GasLimit += int64(0)
-	ledger.GasUsed += deliverResult.GasUsed
-	ledger.TotalPrice = new(big.Int).Add(ledger.TotalPrice, new(big.Int).SetUint64(1))
-
-	return trans, nil
 }
 
 func txTagToTypei(txTag []byte) int {

@@ -9,12 +9,13 @@ import (
 	"github.com/huzhongqing/ginprom"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/wolot/api/config"
-	_ "github.com/wolot/api/docs"
-	"github.com/wolot/api/libs/ginlimiter"
-	"github.com/wolot/api/web/dbo"
-	"github.com/wolot/api/web/handlers"
-	"github.com/wolot/api/web/proxy"
+	"github.com/toolglobal/api/config"
+	_ "github.com/toolglobal/api/docs"
+	"github.com/toolglobal/api/libs"
+	"github.com/toolglobal/api/libs/ginlimiter"
+	"github.com/toolglobal/api/web/dbo"
+	"github.com/toolglobal/api/web/handlers"
+	"github.com/toolglobal/api/web/proxy"
 	"github.com/zsais/go-gin-prometheus"
 	"go.uber.org/zap"
 	"os"
@@ -57,6 +58,9 @@ func (s *Server) Start() {
 
 	// 日志打印中间件
 	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/", "/metrics", "/health"}}))
+
+	// cross domain
+	router.Use(libs.Cors())
 
 	router.Any("/", func(context *gin.Context) {
 		context.String(200, "%s", "ok")
@@ -107,6 +111,11 @@ func (s *Server) Start() {
 		contract.POST("/call", s.handler.ContractCallTx)     //call合约(evm本地执行，不消耗gas，不上链)
 	}
 
+	erc20Group := router.Group("/v2/erc20")
+	{
+		erc20Group.GET("/:token/balanceOf/:to", s.handler.BalanceOf)
+	}
+
 	v3 := router.Group("/v3")
 	{
 		v3.GET("/ledgers", s.handler.QueryV3Ledgers)
@@ -121,17 +130,6 @@ func (s *Server) Start() {
 		v3.GET("/ledgers/:height/payments", s.handler.QueryV3LedgerPayments)
 		v3.GET("/accounts/:address/payments", s.handler.QueryV3AccPayments)
 		v3.GET("/transactions/:txhash/payments", s.handler.QueryV3TxPayments)
-
-		v3.POST("/delegate", s.handler.V3_SendDelegateTx)
-		v3.GET("/nodes", s.handler.V3QueryNodes)
-		v3.GET("/nodes/:address", s.handler.V3QueryNode)
-		v3.GET("/nodes/:address/voters", s.handler.V3QueryNodeVoters)
-		v3.GET("/voters/:address", s.handler.V3QueryVoter)
-		v3.GET("/dpos/pool", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryPool))
-		v3.GET("/dpos/poollogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryPoolLogs))
-		v3.GET("/dpos/tcnlogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryTcnLogs))
-		v3.GET("/dpos/tinlogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryTinLogs))
-		v3.GET("/dpos/ranklogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryRankLogs))
 
 		v3.GET("/config/tokens", s.handler.V3QueryConfigTokens)
 		v3.GET("/config/nodes", s.handler.V3QueryConfigNodes)
