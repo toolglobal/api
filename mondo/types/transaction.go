@@ -35,13 +35,13 @@ var (
 	//TxTagAppOLO         = TxTag{1, 1}     // 原生交易 v1 - v3废弃
 	TxTagAppEvm = TxTag{1, 2} // 合约交易
 	//TxTagAppFee         = TxTag{1, 3}     // 收取手续费 - v3废弃
-	TxTagAppBatch       = TxTag{1, 4}     // 批量交易
-	TxTagEthereumTx     = TxTag{1, 5}     // 以太坊兼容交易
-	TxTagNodeDelegate   = TxTag{2, 1}     // 节点抵押赎回提现
-	TxTagUserDelegate   = TxTag{2, 2}     // 用户抵押赎回提现
-	TxTagAppEvmMultisig = TxTag{3, 2}     // EVM多签交易
-	TxTagAppParams      = TxTag{255, 0}   // 修改APP参数
-	TxTagAppMgr         = TxTag{255, 255} // 节点管理交易
+	TxTagAppBatch   = TxTag{1, 4} // 批量交易
+	TxTagEthereumTx = TxTag{1, 5} // 以太坊兼容交易
+	//TxTagNodeDelegate   = TxTag{2, 1}     // 节点抵押赎回提现
+	//TxTagUserDelegate   = TxTag{2, 2}     // 用户抵押赎回提现
+	TxTagAppEvmMultisig = TxTag{3, 2} // EVM多签交易
+	//TxTagAppParams      = TxTag{255, 0} // 修改APP参数
+	//TxTagAppMgr         = TxTag{255, 255} // 节点管理交易
 )
 
 type HashTx interface {
@@ -67,26 +67,10 @@ func DecodeTx(raw []byte) (TxTag, HashTx, error) {
 		var tx ethtypes.Transaction
 		err := rlp.DecodeBytes(inputData, &tx)
 		return TxTagEthereumTx, &tx, err
-	case bytes.HasPrefix(raw, TxTagAppMgr[:]):
-		var tx TxManage
-		err := tx.FromBytes(inputData)
-		return TxTagAppMgr, &tx, err
-	case bytes.HasPrefix(raw, TxTagNodeDelegate[:]):
-		var tx TxNodeDelegate
-		err := tx.FromBytes(inputData)
-		return TxTagNodeDelegate, &tx, err
-	case bytes.HasPrefix(raw, TxTagUserDelegate[:]):
-		var tx TxUserDelegate
-		err := tx.FromBytes(inputData)
-		return TxTagUserDelegate, &tx, err
 	case bytes.HasPrefix(raw, TxTagAppEvmMultisig[:]):
 		var tx MultisigEvmTx
 		err := tx.FromBytes(inputData)
 		return TxTagAppEvmMultisig, &tx, err
-	case bytes.HasPrefix(raw, TxTagAppParams[:]):
-		var tx TxParams
-		err := tx.FromBytes(inputData)
-		return TxTagAppParams, &tx, err
 	}
 	return [2]byte{}, nil, nil
 }

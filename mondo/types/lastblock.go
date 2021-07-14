@@ -9,17 +9,10 @@ import (
 )
 
 type LastBlockInfo struct {
-	Height           int64
-	StateRoot        ethcmn.Hash
-	XStateRoot       ethcmn.Hash
-	AppHash          ethcmn.Hash
-	PrevHash         ethcmn.Hash
-	ValidatorUpdates []ABCIValidator
-}
-
-type ABCIValidator struct {
-	PubKey [32]byte
-	Power  int64
+	Height    int64
+	StateRoot ethcmn.Hash
+	AppHash   ethcmn.Hash
+	PrevHash  ethcmn.Hash
 }
 
 func (block *LastBlockInfo) FromBytes(bz []byte) {
@@ -51,16 +44,13 @@ func LoadLastBlock(db ethdb.Database) (lastBlock LastBlockInfo) {
 	return lastBlock
 }
 
-func SaveLastBlock(db ethdb.Database, appHash ethcmn.Hash, header *AppHeader, valUpdates []ABCIValidator) {
+func SaveLastBlock(db ethdb.Database, appHash ethcmn.Hash, header *AppHeader) {
 	lastBlock := LastBlockInfo{
-		Height:     header.Height.Int64(),
-		StateRoot:  header.StateRoot,
-		XStateRoot: header.XStateRoot,
-		AppHash:    appHash,
-		PrevHash:   header.PrevHash,
+		Height:    header.Height.Int64(),
+		StateRoot: header.StateRoot,
+		AppHash:   appHash,
+		PrevHash:  header.PrevHash,
 	}
-	lastBlock.ValidatorUpdates = make([]ABCIValidator, len(valUpdates))
-	copy(lastBlock.ValidatorUpdates, valUpdates)
 
 	buf, err := amino.MarshalBinaryBare(&lastBlock)
 	if err != nil {

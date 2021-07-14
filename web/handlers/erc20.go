@@ -57,11 +57,16 @@ func (hd *Handler) BalanceOf(ctx *gin.Context) {
 		hd.responseWrite(ctx, false, err.Error())
 		return
 	}
-	balance := new(big.Int)
-	if err := abiIns.Unpack(&balance, "balanceOf", utils.HexToBytes(evmResult.Ret)); err != nil {
+	results, err := abiIns.Unpack("balanceOf", utils.HexToBytes(evmResult.Ret))
+	if err != nil {
 		hd.responseWrite(ctx, false, err.Error())
 		return
 	}
 
+	if len(results) != 1 {
+		hd.responseWrite(ctx, false, "Wrong contract execute result")
+		return
+	}
+	balance := results[0].(*big.Int)
 	hd.responseWrite(ctx, true, balance.String())
 }

@@ -10,16 +10,14 @@ import (
 )
 
 type AppBlock struct {
-	Height     int64
-	StateRoot  ethcmn.Hash
-	XStateRoot ethcmn.Hash
+	Height    int64
+	StateRoot ethcmn.Hash
 }
 
-func NewAppBlock(height int64, root1, root2 ethcmn.Hash) *AppBlock {
+func NewAppBlock(height int64, root ethcmn.Hash) *AppBlock {
 	return &AppBlock{
-		Height:     height,
-		StateRoot:  root1,
-		XStateRoot: root2,
+		Height:    height,
+		StateRoot: root,
 	}
 }
 

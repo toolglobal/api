@@ -131,17 +131,6 @@ func (s *Server) Start() {
 		v3.GET("/accounts/:address/payments", s.handler.QueryV3AccPayments)
 		v3.GET("/transactions/:txhash/payments", s.handler.QueryV3TxPayments)
 
-		v3.POST("/delegate", s.handler.V3_SendDelegateTx)
-		v3.GET("/nodes", s.handler.V3QueryNodes)
-		v3.GET("/nodes/:address", s.handler.V3QueryNode)
-		v3.GET("/nodes/:address/voters", s.handler.V3QueryNodeVoters)
-		v3.GET("/voters/:address", s.handler.V3QueryVoter)
-		v3.GET("/dpos/pool", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryPool))
-		v3.GET("/dpos/poollogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryPoolLogs))
-		v3.GET("/dpos/tcnlogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryTcnLogs))
-		v3.GET("/dpos/tinlogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryTinLogs))
-		v3.GET("/dpos/ranklogs", cache.CachePageAtomic(store, time.Second*5, s.handler.V3QueryRankLogs))
-
 		v3.GET("/config/tokens", s.handler.V3QueryConfigTokens)
 		v3.GET("/config/nodes", s.handler.V3QueryConfigNodes)
 		v3.GET("/ext/price/:symbol", cache.CachePageAtomic(store, time.Minute, s.handler.V3QueryPrice))

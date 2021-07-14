@@ -8,7 +8,6 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/wolot/api/utils"
 )
 
 // 1对多批量交易
@@ -79,14 +78,14 @@ func (tx *TxBatch) SigHash() ethcmn.Hash {
 		tx.Ops,
 	})
 
-	return utils.RLPHash(message)
+	return RLPHash(message)
 }
 
 func (tx *TxBatch) Hash() ethcmn.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(ethcmn.Hash)
 	}
-	v := utils.RLPHash(tx)
+	v := RLPHash(tx)
 	tx.hash.Store(v)
 	return v
 }
