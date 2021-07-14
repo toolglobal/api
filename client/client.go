@@ -3,9 +3,9 @@ package client
 import (
 	"context"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/wolot/api/config"
-	"github.com/wolot/api/datamanager"
-	"github.com/wolot/api/libs/log"
+	"github.com/toolglobal/api/config"
+	"github.com/toolglobal/api/datamanager"
+	"github.com/toolglobal/api/libs/log"
 	"go.uber.org/zap"
 	"strings"
 	"time"

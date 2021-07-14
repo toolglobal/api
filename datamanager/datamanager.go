@@ -3,7 +3,7 @@ package datamanager
 import (
 	"sync"
 
-	"github.com/wolot/api/database"
+	"github.com/toolglobal/api/database"
 )
 
 // DBCreator to create db instance

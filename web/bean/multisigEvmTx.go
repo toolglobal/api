@@ -2,7 +2,7 @@ package bean
 
 import (
 	"errors"
-	"github.com/wolot/api/mondo/types"
+	"github.com/toolglobal/api/mondo/types"
 )
 
 // ----合约相关

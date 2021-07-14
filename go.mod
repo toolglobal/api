@@ -1,4 +1,4 @@
-module github.com/wolot/api
+module github.com/toolglobal/api
 
 go 1.14
 

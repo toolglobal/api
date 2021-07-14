@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/gin-gonic/gin"
-	"github.com/wolot/api/mondo/types"
-	"github.com/wolot/api/web/bean"
+	"github.com/toolglobal/api/mondo/types"
+	"github.com/toolglobal/api/web/bean"
 )
 
 // @Summary 随机生成mondo账户

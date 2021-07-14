@@ -1,7 +1,7 @@
 package dbo
 
 import (
-	"github.com/wolot/api/database"
+	"github.com/toolglobal/api/database"
 )
 
 func (app *DBO) QueryV3Ledgers(begin, end uint64, cursor, limit uint64, order string) ([]database.V3Ledger, error) {

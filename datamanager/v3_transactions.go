@@ -2,7 +2,7 @@ package datamanager
 
 import (
 	"database/sql"
-	"github.com/wolot/api/database"
+	"github.com/toolglobal/api/database"
 )
 
 func (m *DataManager) PrepareV3Transaction() (*sql.Stmt, error) {

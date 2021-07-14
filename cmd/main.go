@@ -4,14 +4,14 @@ import (
 	"context"
 	"os"
 
-	"github.com/wolot/api/client"
-	"github.com/wolot/api/config"
-	"github.com/wolot/api/database"
-	"github.com/wolot/api/database/basesql"
-	"github.com/wolot/api/datamanager"
-	"github.com/wolot/api/libs/log"
-	"github.com/wolot/api/web/dbo"
-	"github.com/wolot/api/web/server"
+	"github.com/toolglobal/api/client"
+	"github.com/toolglobal/api/config"
+	"github.com/toolglobal/api/database"
+	"github.com/toolglobal/api/database/basesql"
+	"github.com/toolglobal/api/datamanager"
+	"github.com/toolglobal/api/libs/log"
+	"github.com/toolglobal/api/web/dbo"
+	"github.com/toolglobal/api/web/server"
 	"go.uber.org/zap"
 )
 

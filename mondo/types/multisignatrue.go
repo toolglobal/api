@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/wolot/api/mondo/types/bitarray"
+	"github.com/toolglobal/api/mondo/types/bitarray"
 )
 
 // Multisignature is used to represent the signature object used in the multisigs.

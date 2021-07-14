@@ -2,13 +2,13 @@ package client
 
 import (
 	"context"
-	"github.com/wolot/api/config"
+	"github.com/toolglobal/api/config"
 	"testing"
 
-	"github.com/wolot/api/database"
-	"github.com/wolot/api/database/basesql"
-	"github.com/wolot/api/datamanager"
-	"github.com/wolot/api/libs/log"
+	"github.com/toolglobal/api/database"
+	"github.com/toolglobal/api/database/basesql"
+	"github.com/toolglobal/api/datamanager"
+	"github.com/toolglobal/api/libs/log"
 )
 
 var dataMgr *datamanager.DataManager
