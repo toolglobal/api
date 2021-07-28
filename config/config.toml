@@ -2,67 +2,12 @@ bind = ":8889"
 rpc = "127.0.0.1:26657"
 dev = true
 metrics = true
-startHeight = 1
+chainId = 386
 versions = [3]
+startHeight = 1
+tgsBaseURL = "http://api.dev.crycx.com:8080"
 
 [limiter]
 interval = "0h0m1s"
-capacity = 10
+capacity = 100
 
-[[nodes.nodes]]
-name = "IBD-TECH"
-address = "D9837D1C31CD819B701B54E80444AAF8F469F72F"
-
-[[nodes.nodes]]
-name = "CRYCX"
-address = "A8435DD54DA88322F0122A13FF429A9FAF9AA859"
-
-[[nodes.nodes]]
-name = "u萌"
-address = "2E160A40FD6E6FB356CEFB23EDF0E64F34E7BA39"
-
-[[nodes.nodes]]
-name = "长青"
-address = "ACF92FEE80744C2B9DC1677EDBE695A80F4E18EE"
-
-[[tokens.coins]]
-name = "Tool Global"
-symbol = "OLO"
-address = "0x0000000000000000000000000000000000000000"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/OLO.ico"
-
-[[tokens.coins]]
-name = "Bridge Digital Economy"
-symbol = "BDE"
-address = "0x67EbBA731DCd5b763F5699650920a637eDbBEb93"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/BDE.ico"
-
-[[tokens.coins]]
-name = "Wrapped OLO"
-symbol = "WOLO"
-address = "0x8a8eF5E5241C7A3f311aFBF2a9ec154c2568606A"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/OLO.ico"
-
-[[tokens.coins]]
-name = "Wrapped BTC"
-symbol = "oBTC"
-address = "0x1f6F257E7fe9De46f25645e32cbf82aAA22976ea"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/BTC.ico"
-
-[[tokens.coins]]
-name = "Wrapped USDT"
-symbol = "oUSDT"
-address = "0x497cA24e4CC5898c842f9548fa04c3E4ED02d84b"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/USDT.ico"
-
-[[tokens.coins]]
-name = "Wrapped ETH"
-symbol = "oETH"
-address = "0x2D8f49862b24AD507b8c6d6D15a3A19f082700c4"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/ETH.ico"

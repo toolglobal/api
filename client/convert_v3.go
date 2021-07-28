@@ -356,7 +356,8 @@ func (cli *Client) resolveTxEvents(tx *database.V3Transaction) ([]database.V3Pay
 		}
 
 		var symbol string
-		if token, ok := cli.tokens[v.Address.Hex()]; ok {
+
+		if token, ok := cli.tokenMgr.Token(v.Address.Hex()); ok {
 			symbol = token.Symbol
 		}
 

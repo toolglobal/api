@@ -132,14 +132,14 @@ func (s *Server) Start() {
 		v3.GET("/transactions/:txhash/payments", s.handler.QueryV3TxPayments)
 
 		v3.GET("/config/tokens", s.handler.V3QueryConfigTokens)
-		v3.GET("/config/nodes", s.handler.V3QueryConfigNodes)
+		//v3.GET("/config/nodes", s.handler.V3QueryConfigNodes)
 		v3.GET("/ext/price/:symbol", cache.CachePageAtomic(store, time.Minute, s.handler.V3QueryPrice))
 		//v3.GET("/ext/price/:symbol", s.handler.V3QueryPrice)
 	}
 
 	// reverse proxy
-	s.proxy.SetPrefixPath("/v2/proxy")
-	router.GET("/v2/proxy/*proxypath", gin.WrapH(s.proxy.Proxy()))
+	//s.proxy.SetPrefixPath("/v2/proxy")
+	//router.GET("/v2/proxy/*proxypath", gin.WrapH(s.proxy.Proxy()))
 
 	if len(os.Args) > 1 && os.Args[1] == "version" {
 		return
