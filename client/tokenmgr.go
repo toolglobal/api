@@ -113,7 +113,7 @@ func (m *TokenMgr) fetchAllCoins() ([]token, error) {
 		if err != nil {
 			return nil, err
 		}
-
+		log.Logger.Info("sync", zap.Any("tokens", res))
 		if res.Code != 0 {
 			return nil, fmt.Errorf("code %d msg %s", res.Code, res.Msg)
 		}
