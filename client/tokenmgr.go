@@ -104,12 +104,12 @@ func (m *TokenMgr) fetchAllCoins() ([]token, error) {
 	}
 
 	fetch := func(r req) ([]token, error) {
-		res := &resp{}
+		res := resp{}
 		err := httpc.New(m.baseURL).Path("/v1/token/list").
 			Query("page", strconv.FormatInt(int64(r.Page), 32)).
 			Query("pageSize", strconv.FormatInt(int64(r.PageSize), 32)).
 			Query("chainId", r.ChainId).
-			Query("status", strconv.FormatInt(int64(r.Status), 32)).Get(&res)
+			Query("status", strconv.FormatInt(int64(r.Status), 32)).Get(&res, httpc.TypeApplicationJson)
 		if err != nil {
 			return nil, err
 		}
