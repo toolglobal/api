@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/toolglobal/api/config"
 	"github.com/toolglobal/api/datamanager"
 	"github.com/toolglobal/api/libs/log"
 	"go.uber.org/zap"
@@ -19,17 +18,17 @@ type Client struct {
 	fetch         Fetcher
 	dataMgr       *datamanager.DataManager
 	version       int
-	tokens        map[string]config.ERC20
+	tokenMgr      *TokenMgr
 	abi           abi.ABI
 }
 
-func NewClient(ctx context.Context, coins config.Tokens, version int, rpcRemote string, mgr *datamanager.DataManager, startHeight int64) (*Client, error) {
+func NewClient(ctx context.Context, tgsBaseURL, chainId string, version int, rpcRemote string, mgr *datamanager.DataManager, startHeight int64) (*Client, error) {
 	cli := &Client{
-		ctx:     ctx,
-		fetch:   Fetcher(NewFetch(rpcRemote)),
-		dataMgr: mgr,
-		version: version,
-		tokens:  make(map[string]config.ERC20),
+		ctx:      ctx,
+		fetch:    Fetcher(NewFetch(rpcRemote)),
+		dataMgr:  mgr,
+		version:  version,
+		tokenMgr: NewTokenMgr(tgsBaseURL, chainId),
 	}
 
 	{
@@ -40,9 +39,7 @@ func NewClient(ctx context.Context, coins config.Tokens, version int, rpcRemote 
 		cli.abi = abi
 	}
 
-	for _, v := range coins.Coins {
-		cli.tokens[v.Address] = v
-	}
+	cli.tokenMgr.Start()
 
 	// 获取库里最新的height
 	var (

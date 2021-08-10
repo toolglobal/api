@@ -1,4 +1,7 @@
 # API
+本API程序轮询区块，解析并生成可读的block、transaction、payments数据存入sqlite，提供http REST接口方便查询。
+
+由于新的mondod提供兼容以太坊web3 JSON RPC，本API不再长期支持，请使用者优先使用JSON RPC。
 
 ## Install
 ```shell
@@ -6,23 +9,19 @@ git clone https://github.com/toolglobal/api.git
 cd api && make
 cd build && ./api
 ```
+
 ## config
 ```toml
-bind = ":8889"
-rpc = "127.0.0.1:26657" # mondo tendermint rpc address
-dev = true # dev mode,open api docs http://$bind$/docs/index.html
-metrics = true # gin prometheus
-startHeight = 1 # sync block from startHeight
-versions = [3] # only version 3 is valid
+bind = ":8889" # 监听8889 http端口
+rpc = "127.0.0.1:26657" # 连接本地mondod节点的26657 tendermint rpc端口
+dev = true # 开发模式
+metrics = true # prometheus 监控
+chainId = "8723" # 链id，mainnet：8723 testnet：8724
+versions = [3] # 解析协议版本
+startHeight = 1 # 开始解析区块高度
+tgsBaseURL = "https://services.wolot.io" # 获取官方代币配置的接口
 
-[limiter] # 可选 rate limiter,for /v2/contract/query
+[limiter] # 合约查询限流，合约查询需要执行evm，性能损耗大，可能影响节点稳定
 interval = "0h0m1s"
-capacity = 10
-
-[[tokens.coins]] # 可选，如果配置了token信息，API程序将根据代币合约地址解析该token的转账信息写入payment表，仅支持ERC20 token
-name = "Bridge Digital Economy"
-symbol = "BDE"
-address = "0x67EbBA731DCd5b763F5699650920a637eDbBEb93"
-decimals = 8
-icon = "http://127.0.0.1:8889/static/coin/BDE.ico"
+capacity = 100
 ```

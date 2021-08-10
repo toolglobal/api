@@ -45,7 +45,7 @@ func main() {
 
 	for _, version := range cfg.Versions {
 		if version == 3 {
-			syncCli, err := client.NewClient(context.Background(), cfg.Tokens, version, "http://"+cfg.RPC, dataM3, cfg.StartHeight)
+			syncCli, err := client.NewClient(context.Background(), cfg.TGSBaseURL, cfg.ChainId, version, "http://"+cfg.RPC, dataM3, cfg.StartHeight)
 			if err != nil {
 				panic(err)
 			}
