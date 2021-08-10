@@ -2,10 +2,10 @@ bind = ":8889"
 rpc = "127.0.0.1:26657"
 dev = true
 metrics = true
-chainId = "386"
+chainId = "8723"
 versions = [3]
 startHeight = 1
-tgsBaseURL = "http://api.dev.crycx.com:8080"
+tgsBaseURL = "https://services.wolot.io"
 
 [limiter]
 interval = "0h0m1s"
